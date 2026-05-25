@@ -31,7 +31,7 @@ sudo yum install -y python3 python3-pip git wget
 
 # Install Python dependencies
 echo -e "${YELLOW}🐍 Installing Python dependencies...${NC}"
-pip3 install --user flask flask-cors pydub gunicorn
+# pip3 install --user flask flask-cors pydub gunicorn
 
 # Add local bin to PATH if not already there
 if ! echo $PATH | grep -q "/home/ec2-user/.local/bin"; then
