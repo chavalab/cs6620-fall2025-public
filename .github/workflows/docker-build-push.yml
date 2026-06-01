@@ -41,12 +41,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-          aws --version
+      - name: Check AWS CLI
+        run: aws --version
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -56,19 +52,22 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Send SSM Command to EC2
+      - name: Deploy to EC2 using SSM
         run: |
-          echo "Sending deployment command via SSM..."
+          echo "Sending SSM command to EC2..."
 
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy latest Docker image from GitHub Actions" \
             --parameters 'commands=[
-              "echo Starting deployment",
+              "echo Pulling latest image",
               "docker pull '${{ secrets.DOCKERHUB_USERNAME }}'/cs6620-app:latest",
+              "echo Stopping container",
               "docker stop cs6620-app || true",
+              "echo Removing old container",
               "docker rm cs6620-app || true",
+              "echo Starting new container",
               "docker run -d --name cs6620-app -p 80:5000 --restart unless-stopped '${{ secrets.DOCKERHUB_USERNAME }}'/cs6620-app:latest",
               "echo Deployment complete"
             ]' \
