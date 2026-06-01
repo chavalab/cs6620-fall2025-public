@@ -8,6 +8,7 @@ from pydub import AudioSegment
 import tempfile
 
 app = Flask(__name__)
+
 CORS(app)
 
 # Built with GitHub Actions
